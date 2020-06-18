@@ -1,55 +1,32 @@
-const express = require('express');
-const mongoose = require('mongoose');
-
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 // Loading env vars from .env
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
-const user  = require('./models/user')
-
 // Craeting the server instance
-const app = express()
+const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
+const userRouter = require("./controlers/user");
 // Connect to database
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true});
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
 
-const db = mongoose.connection
+db.once("open", function () {
+  console.log("Connected to databse");
+});
 
-db.on('error', console.error.bind(console, 'connection error:'));
+app.use("/user", userRouter);
 
-db.once('open', function() {
-   console.log('Connected to databse')
-  });
-
-// Congfireing endpoints
-app.get('/', function (req, res) {
-    res.send('Hello World!');
-  });
-
-  app.get('/createUser',  async function (req, res) {
-
-    await user.create({
-        firstName:'Ayham',
-        dateOfBirth: new Date(),
-        email:'tamim@trest.de',
-        password:'12345'
-    });
-
-    res.send('User created');
-  });
-
-  app.get('/allUsers', async function (req, res) {
-    const users = await user.find()
-    console.log(users)
-    res.send('Hello hamada!');
-  })
-
-
-
-
-
-  // Start the server
-  app.listen(8000, function () {
-    console.log('Server app listening on port 8000!');
-  });
+// Start the server
+app.listen(8000, function () {
+  console.log("Server app listening on port 8000!");
+});
