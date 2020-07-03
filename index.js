@@ -11,7 +11,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const userRouter = require("./controlers/user");
-const postRouter = require("./controlers/post")
+const postRouter = require("./controlers/post");
+
+
 // Connect to database
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
@@ -27,6 +29,7 @@ db.once("open", function () {
 
 app.use("/user", userRouter);
 app.use("/post", postRouter);
+
 
 // Start the server
 app.listen(8000, function () {
